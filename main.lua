@@ -12,56 +12,56 @@ local list = {
 		duration = {max = 100, min = -1},
 	},
 	Shape = {
-		speed = {},
-		speedVariance = {},
-		sourcePositionVariancex = {},
-		sourcePositionVariancey = {},
-		gravityx = {},
-		gravityy = {},
-		radialAcceleration = {},
-		radialAccelVariance = {},
-		tangentialAcceleration = {},
-		tangentialAccelVariance = {},
+		speed = {max = 1000, min = -1000},
+		speedVariance = {max = 1000, min = -1000},
+		sourcePositionVariancex = {max = 1000, min = -1000},
+		sourcePositionVariancey = {max = 1000, min = -1000},
+		gravityx = {max = 1000, min = -1000},
+		gravityy = {max = 1000, min = -1000},
+		radialAcceleration = {max = 1000, min = -1000},
+		radialAccelVariance = {max = 1000, min = -1000},
+		tangentialAcceleration = {max = 1000, min = -1000},
+		tangentialAccelVariance = {max = 1000, min = -1000},
 	},
 	Radial = {
-		maxRadius = {},
-		maxRadiusVariance = {},
-		minRadius = {},
-		minRadiusVariance = {},
-		rotatePerSecond = {},
-		rotatePerSecondVariance = {},
+		maxRadius = {max = 1000, min = -1000},
+		maxRadiusVariance = {max = 1000, min = -1000},
+		minRadius = {max = 1000, min = -1000},
+		minRadiusVariance = {max = 1000, min = -1000},
+		rotatePerSecond = {max = 1000, min = -1000},
+		rotatePerSecondVariance = {max = 1000, min = -1000},
 	},
 	Particles = {
-		particleLifespan = {},
-		particleLifespanVariance = {},
-		startParticleSize = {},
-		startParticleSizeVariance = {},
-		finishParticleSize = {},
-		finishParticleSizeVariance = {},
-		rotationStart = {},
-		rotationStartVariance = {},
-		rotationEnd = {},
-		rotationEndVariance = {},
-		blendFuncSource = {},
-		blendFuncDestination = {},
+		particleLifespan = {max = 1000, min = -1000},
+		particleLifespanVariance = {max = 1000, min = -1000},
+		startParticleSize = {max = 1000},
+		startParticleSizeVariance = {max = 1000, min = -1000},
+		finishParticleSize = {max = 1000, min = -1000},
+		finishParticleSizeVariance = {max = 1000, min = -1000},
+		rotationStart = {max = 1000, min = -1000},
+		rotationStartVariance = {max = 1000, min = -1000},
+		rotationEnd = {max = 1000, min = -1000},
+		rotationEndVariance = {max = 1000, min = -1000},
+		-- blendFuncSource = {max = 1000, min = -1000},
+		-- blendFuncDestination = {max = 1000, min = -1000},
 	},
 	Color = {
-		startColorRed = {},
-		startColorGreen = {},
-		startColorBlue = {},
-		startColorAlpha = {},
-		startColorVarianceRed = {},
-		startColorVarianceGreen = {},
-		startColorVarianceBlue = {},
-		startColorVarianceAlpha = {},
-		finishColorRed = {},
-		finishColorGreen = {},
-		finishColorBlue = {},
-		finishColorAlpha = {},
-		finishColorVarianceRed = {},
-		finishColorVarianceGreen = {},
-		finishColorVarianceBlue = {},
-		finishColorVarianceAlpha = {}
+		startColorRed = {max = 1},
+		startColorGreen = {max = 1},
+		startColorBlue = {max = 1},
+		startColorAlpha = {max = 1},
+		startColorVarianceRed = {max = 1},
+		startColorVarianceGreen = {max = 1},
+		startColorVarianceBlue = {max = 1},
+		startColorVarianceAlpha = {max = 1},
+		finishColorRed = {max = 1},
+		finishColorGreen = {max = 1},
+		finishColorBlue = {max = 1},
+		finishColorAlpha = {max = 1},
+		finishColorVarianceRed = {max = 1},
+		finishColorVarianceGreen = {max = 1},
+		finishColorVarianceBlue = {max = 1},
+		finishColorVarianceAlpha = {max = 1}
 	}
 
 }
@@ -127,7 +127,7 @@ function makeSlider(params)
 		top = -10
 	}
 	group:insert(group.slider)
-	group.text = display.newText(group, params.name, 0, (params.y or 0) -20, native.systemFont, 18)
+	group.text = display.newText(group, params.name, 0, (params.y or 0) -20, native.systemFont, 16)
 	group.field = native.newTextField( wScreen * 0.08 + 20,  (params.y or 0) , 40, 20 )
 	group.field.inputType = "number"
 	group.field.size = 10
@@ -139,7 +139,7 @@ function makeSlider(params)
 				name = params.name,
 				value = realValue
 			}
-			group.slider:setValue(realValue / (group.max - group.min) * 100 or 0)
+			group.slider:setValue((realValue - group.min) / (group.max - group.min) * 100 or 0)
 		end
 	end)
 	group:insert(group.field)
@@ -148,9 +148,9 @@ end
 
 function updateEmitter(params)
 	emitter:stop()
-	emitter[params.name] = 0
 	if emitterParams[params.name] then
 		emitterParams[params.name] = params.value
+		display.remove(emitter)
 		emitter = display.newEmitter(emitterParams)
 		middleSheet:insert(emitter)
 	end
@@ -166,7 +166,7 @@ function showPage(name)
 			name = k,
 			max = v.max or 100,
 			min = v.min or 0,
-			y = -200 + (vCount - 1) * 80
+			y = -280 + (vCount - 1) * 40
 		}			
 		page:insert(slider)
 		vCount = vCount + 1
@@ -203,7 +203,7 @@ function init()
 
 	local pageManager = Widget.newSegmentedControl{
 		x = 0,
-		y = -300,
+		y = -350,
 		segmentWidth = wScreen * 0.05,
 		segments = {"Emitter", "Shape", "Radial", "Particles", "Color"},
 		defaultSegment = 1,
