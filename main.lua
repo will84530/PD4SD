@@ -1,8 +1,39 @@
-local leftSheet = display.newGroup()
+
 local RightSheet = display.newGroup()
+local MiddleSheet = display.newGroup()
 local xCenter, yCenter = display.contentCenterX, display.contentCenterY
 local wScreen, hScreen = display.actualContentWidth, display.actualContentHeight
 
-leftSheet.background = display.newRect( leftSheet, 0, 0, wScreen * 0.3, hScreen )
-leftSheet.background
-leftSheet.x, leftSheet.y = wScreen - leftSheet.background.width / 2, yCenter
+function makeSheet(params)
+	local sheet = display.newGroup()
+	sheet.background = display.newRect( sheet, 0, 0, params.width, params.height )
+	sheet.background:setFillColor(params.color[1], params.color[2], params.color[3])
+	sheet.x, sheet.y = params.x, params.y
+	return sheet
+end
+
+local leftSheet = makeSheet{
+	width = wScreen * 0.25,
+	height = hScreen,
+	x = wScreen - wScreen * 0.25 / 2,
+	y = yCenter,
+	color = {0.3, 0.3, 0.5}
+}
+
+local rightSheet = makeSheet{
+	width = wScreen * 0.25,
+	height = hScreen,
+	x = wScreen * 0.25 / 2,
+	y = yCenter,
+	color = {0.5, 0.1, 0.1}
+}
+
+local middleSheet = makeSheet{
+	width = wScreen - (leftSheet.background.width + rightSheet.background.width),
+	height = hScreen,
+	x = xCenter,
+	y = yCenter,
+	color = {0.2, 0.2, 0.2}
+}
+
+
