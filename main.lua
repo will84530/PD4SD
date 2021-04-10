@@ -30,7 +30,9 @@ local emitterParams = {
     angleVariance = -142.62,
     angle = -244.11
 }
-local emitter = display.newEmitter( emitterParams )
+local emitter = display.newEmitter(emitterParams)
+
+local leftSheet, rightSheet, middleSheet
 
 local function makeSheet(params)
 	local sheet = display.newGroup()
@@ -42,21 +44,41 @@ end
 
 local function makeSlider(params)
 	local group = display.newGroup()
-	local slider = Widget.newSlider{
-		width = 60,
-		value = emitterParams[params.name] or 50,
-		listener = function()
-			print('!')
+	group.max = params.max or 100
+	group.min = params.min or 0
+	group.slider = Widget.newSlider{
+		x = -20,
+		width = wScreen * 0.15,
+		value = emitterParams[params.name] / group.max * 100 or 50,
+		listener = function(event)
+			realValue = event.value * group.max / 100
+			updateEmitter{
+				name = params.name,
+				value = realValue
+			}
+			group.value.text = realValue
 		end,
-		top = 0.5
+		top = -10
 	}
-	group:insert(slider)
+	group:insert(group.slider)
+	group.text = display.newText(group, params.name, 0, -20, native.systemFont, 18)
+	group.value = display.newText(group, emitterParams[params.name], group.slider.width / 2 + 20,  group.slider.height / 4, native.systemFont, 12)
 	return group
 end
 
+function updateEmitter(params)
+	emitter:stop()
+	emitter[params.name] = 0
+	if emitterParams[params.name] then
+		emitterParams[params.name] = params.value
+		emitter = display.newEmitter(emitterParams)
+		middleSheet:insert(emitter)
+	end
+	emitter:start()
+end
 
 local function init()
-	local leftSheet = makeSheet{
+	leftSheet = makeSheet{
 		width = wScreen * 0.25,
 		height = hScreen,
 		x = wScreen - wScreen * 0.25 / 2,
@@ -64,7 +86,7 @@ local function init()
 		color = {0.3, 0.3, 0.5}
 	}
 
-	local rightSheet = makeSheet{
+	rightSheet = makeSheet{
 		width = wScreen * 0.25,
 		height = hScreen,
 		x = wScreen * 0.25 / 2,
@@ -72,7 +94,7 @@ local function init()
 		color = {0.5, 0.1, 0.1}
 	}
 
-	local middleSheet = makeSheet{
+	middleSheet = makeSheet{
 		width = wScreen - (leftSheet.background.width + rightSheet.background.width),
 		height = hScreen,
 		x = xCenter,
@@ -83,7 +105,8 @@ local function init()
 	middleSheet:insert(emitter)
 
 	local slider = makeSlider{
-		name = 'maxParticles'
+		name = 'maxParticles',
+		max = 500
 	}
 	leftSheet:insert(slider)
 end
