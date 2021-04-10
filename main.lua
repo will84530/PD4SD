@@ -1,6 +1,5 @@
+local Widget = require( "widget" )
 
-local RightSheet = display.newGroup()
-local MiddleSheet = display.newGroup()
 local xCenter, yCenter = display.contentCenterX, display.contentCenterY
 local wScreen, hScreen = display.actualContentWidth, display.actualContentHeight
 local emitterParams = {
@@ -33,7 +32,7 @@ local emitterParams = {
 }
 local emitter = display.newEmitter( emitterParams )
 
-function makeSheet(params)
+local function makeSheet(params)
 	local sheet = display.newGroup()
 	sheet.background = display.newRect( sheet, 0, 0, params.width, params.height )
 	sheet.background:setFillColor(params.color[1], params.color[2], params.color[3])
@@ -41,30 +40,52 @@ function makeSheet(params)
 	return sheet
 end
 
-local leftSheet = makeSheet{
-	width = wScreen * 0.25,
-	height = hScreen,
-	x = wScreen - wScreen * 0.25 / 2,
-	y = yCenter,
-	color = {0.3, 0.3, 0.5}
-}
-
-local rightSheet = makeSheet{
-	width = wScreen * 0.25,
-	height = hScreen,
-	x = wScreen * 0.25 / 2,
-	y = yCenter,
-	color = {0.5, 0.1, 0.1}
-}
-
-local middleSheet = makeSheet{
-	width = wScreen - (leftSheet.background.width + rightSheet.background.width),
-	height = hScreen,
-	x = xCenter,
-	y = yCenter,
-	color = {0.2, 0.2, 0.2}
-}
-
-middleSheet:insert(emitter)
+local function makeSlider(params)
+	local group = display.newGroup()
+	local slider = Widget.newSlider{
+		width = 60,
+		value = emitterParams[params.name] or 50,
+		listener = function()
+			print('!')
+		end,
+		top = 0.5
+	}
+	group:insert(slider)
+	return group
+end
 
 
+local function init()
+	local leftSheet = makeSheet{
+		width = wScreen * 0.25,
+		height = hScreen,
+		x = wScreen - wScreen * 0.25 / 2,
+		y = yCenter,
+		color = {0.3, 0.3, 0.5}
+	}
+
+	local rightSheet = makeSheet{
+		width = wScreen * 0.25,
+		height = hScreen,
+		x = wScreen * 0.25 / 2,
+		y = yCenter,
+		color = {0.5, 0.1, 0.1}
+	}
+
+	local middleSheet = makeSheet{
+		width = wScreen - (leftSheet.background.width + rightSheet.background.width),
+		height = hScreen,
+		x = xCenter,
+		y = yCenter,
+		color = {0.2, 0.2, 0.2}
+	}
+
+	middleSheet:insert(emitter)
+
+	local slider = makeSlider{
+		name = 'maxParticles'
+	}
+	leftSheet:insert(slider)
+end
+
+init()
