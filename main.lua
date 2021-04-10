@@ -96,7 +96,7 @@ local emitterParams = {
 }
 local emitter = display.newEmitter(emitterParams)
 
-local leftSheet, rightSheet, middleSheet
+local rightSheet, rightSheet, middleSheet
 local page
 
 function makeSheet(params)
@@ -171,11 +171,11 @@ function showPage(name)
 		page:insert(slider)
 		vCount = vCount + 1
 	end
-	leftSheet:insert(page)
+	rightSheet:insert(page)
 end
 
 function init()
-	leftSheet = makeSheet{
+	rightSheet = makeSheet{
 		width = wScreen * 0.25,
 		height = hScreen,
 		x = wScreen - wScreen * 0.25 / 2,
@@ -183,7 +183,7 @@ function init()
 		color = {0.3, 0.3, 0.5}
 	}
 
-	rightSheet = makeSheet{
+	leftSheet = makeSheet{
 		width = wScreen * 0.25,
 		height = hScreen,
 		x = wScreen * 0.25 / 2,
@@ -192,7 +192,7 @@ function init()
 	}
 
 	middleSheet = makeSheet{
-		width = wScreen - (leftSheet.background.width + rightSheet.background.width),
+		width = wScreen - (rightSheet.background.width + rightSheet.background.width),
 		height = hScreen,
 		x = xCenter,
 		y = yCenter,
@@ -201,6 +201,17 @@ function init()
 
 	middleSheet:insert(emitter)
 
+	local pageManager = Widget.newSegmentedControl{
+		x = 0,
+		y = -300,
+		segmentWidth = wScreen * 0.05,
+		segments = {"Emitter", "Shape", "Radial", "Particles", "Color"},
+		defaultSegment = 1,
+		onPress = function(event)
+			showPage(event.target.segmentLabel)
+		end
+	}
+	rightSheet:insert(pageManager)
 	showPage("Emitter")
 	
 end
