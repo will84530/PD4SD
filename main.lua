@@ -2,6 +2,17 @@ local Widget = require( "widget" )
 
 local xCenter, yCenter = display.contentCenterX, display.contentCenterY
 local wScreen, hScreen = display.actualContentWidth, display.actualContentHeight
+local list = {
+	general = {
+		maxParticles = {component = "slider", max = 500, min = 1},
+		angle = {component = "slider", max = 360},
+		angleVariance = {component = "slider", max = 360},
+		emitterType = {component = "slider", max = 1},
+		absolutePosition = {component = "checker"},
+		duration = {component = "slider", max = 100, min = -1},
+	}
+}
+
 local emitterParams = {
 	startColorAlpha = 1,
     startParticleSizeVariance = 53.47,
@@ -34,7 +45,7 @@ local emitter = display.newEmitter(emitterParams)
 
 local leftSheet, rightSheet, middleSheet
 
-local function makeSheet(params)
+function makeSheet(params)
 	local sheet = display.newGroup()
 	sheet.background = display.newRect( sheet, 0, 0, params.width, params.height )
 	sheet.background:setFillColor(params.color[1], params.color[2], params.color[3])
@@ -42,14 +53,15 @@ local function makeSheet(params)
 	return sheet
 end
 
-local function makeSlider(params)
+function makeSlider(params)
 	local group = display.newGroup()
 	group.max = params.max or 100
 	group.min = params.min or 0
 	group.slider = Widget.newSlider{
 		x = -20,
+		y = params.y or 0,
 		width = wScreen * 0.15,
-		value = emitterParams[params.name] / (group.max - group.min) * 100 or 0,
+		value = (emitterParams[params.name] or 0) / (group.max - group.min) * 100 or 0,
 		listener = function(event)
 			realValue = (event.value * (group.max - group.min) / 100) + group.min
 			updateEmitter{
@@ -61,12 +73,21 @@ local function makeSlider(params)
 		top = -10
 	}
 	group:insert(group.slider)
-	group.text = display.newText(group, params.name, 0, -20, native.systemFont, 18)
-	group.field = native.newTextField( group.slider.width / 2 + 20,  group.slider.height / 4, 40, 20 )
+	group.text = display.newText(group, params.name, 0, (params.y or 0) -20, native.systemFont, 18)
+	group.field = native.newTextField( wScreen * 0.08 + 20,  (params.y or 0) , 40, 20 )
 	group.field.inputType = "number"
 	group.field.size = 10
 	group.field.text = tostring(emitterParams[params.name])
-	-- group.field.
+	group.field:addEventListener("userInput", function(event)
+		if event.phase == "ended" or event.phase == "submitted" then
+			realValue = tonumber(group.field.text)
+			updateEmitter{
+				name = params.name,
+				value = realValue
+			}
+			group.slider:setValue(realValue / (group.max - group.min) * 100 or 0)
+		end
+	end)
 	group:insert(group.field)
 	return group
 end
@@ -82,7 +103,7 @@ function updateEmitter(params)
 	emitter:start()
 end
 
-local function init()
+function init()
 	leftSheet = makeSheet{
 		width = wScreen * 0.25,
 		height = hScreen,
@@ -109,12 +130,21 @@ local function init()
 
 	middleSheet:insert(emitter)
 
-	local slider = makeSlider{
-		name = 'maxParticles',
-		max = 500,
-		min = 1
-	}
-	leftSheet:insert(slider)
+	local count = 0
+	for k, v in pairs(list.general) do
+		if v.component == 'slider' then
+			local slider = makeSlider{
+				name = k,
+				max = v.max or 100,
+				min = v.min or 0,
+				y = -200 + count * 80
+			}
+			leftSheet:insert(slider)
+		end
+		count = count + 1
+	end
+
+	
 end
 
 init()
