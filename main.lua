@@ -5,8 +5,8 @@ local wScreen, hScreen = display.actualContentWidth, display.actualContentHeight
 local list = {
 	Emitter = {
 		maxParticles = {max = 500, min = 1},
-		angle = {max = 360},
-		angleVariance = {max = 360},
+		angle = {max = 360, min = -360},
+		angleVariance = {max = 360, min = -360},
 		emitterType = {max = 1},
 		absolutePosition = {},
 		duration = {max = 100, min = -1},
@@ -115,7 +115,7 @@ function makeSlider(params)
 		x = -20,
 		y = params.y or 0,
 		width = wScreen * 0.15,
-		value = (emitterParams[params.name] or 0) / (group.max - group.min) * 100 or 0,
+		value = ((emitterParams[params.name] or 0) - group.min) / (group.max - group.min) * 100 or 0,
 		listener = function(event)
 			realValue = (event.value * (group.max - group.min) / 100) + group.min
 			updateEmitter{
@@ -201,7 +201,6 @@ function init()
 
 	middleSheet:insert(emitter)
 
-	showPage("Shape")
 	showPage("Emitter")
 	
 end
