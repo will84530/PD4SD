@@ -49,20 +49,25 @@ local function makeSlider(params)
 	group.slider = Widget.newSlider{
 		x = -20,
 		width = wScreen * 0.15,
-		value = emitterParams[params.name] / group.max * 100 or 50,
+		value = emitterParams[params.name] / (group.max - group.min) * 100 or 0,
 		listener = function(event)
-			realValue = event.value * group.max / 100
+			realValue = (event.value * (group.max - group.min) / 100) + group.min
 			updateEmitter{
 				name = params.name,
 				value = realValue
 			}
-			group.value.text = realValue
+			group.field.text = tostring(realValue)
 		end,
 		top = -10
 	}
 	group:insert(group.slider)
 	group.text = display.newText(group, params.name, 0, -20, native.systemFont, 18)
-	group.value = display.newText(group, emitterParams[params.name], group.slider.width / 2 + 20,  group.slider.height / 4, native.systemFont, 12)
+	group.field = native.newTextField( group.slider.width / 2 + 20,  group.slider.height / 4, 40, 20 )
+	group.field.inputType = "number"
+	group.field.size = 10
+	group.field.text = tostring(emitterParams[params.name])
+	-- group.field.
+	group:insert(group.field)
 	return group
 end
 
@@ -91,7 +96,7 @@ local function init()
 		height = hScreen,
 		x = wScreen * 0.25 / 2,
 		y = yCenter,
-		color = {0.5, 0.1, 0.1}
+		color = {0.4, 0.1, 0.1}
 	}
 
 	middleSheet = makeSheet{
@@ -106,7 +111,8 @@ local function init()
 
 	local slider = makeSlider{
 		name = 'maxParticles',
-		max = 500
+		max = 500,
+		min = 1
 	}
 	leftSheet:insert(slider)
 end
