@@ -3,14 +3,67 @@ local Widget = require( "widget" )
 local xCenter, yCenter = display.contentCenterX, display.contentCenterY
 local wScreen, hScreen = display.actualContentWidth, display.actualContentHeight
 local list = {
-	general = {
-		maxParticles = {component = "slider", max = 500, min = 1},
-		angle = {component = "slider", max = 360},
-		angleVariance = {component = "slider", max = 360},
-		emitterType = {component = "slider", max = 1},
-		absolutePosition = {component = "checker"},
-		duration = {component = "slider", max = 100, min = -1},
+	Emitter = {
+		maxParticles = {max = 500, min = 1},
+		angle = {max = 360},
+		angleVariance = {max = 360},
+		emitterType = {max = 1},
+		absolutePosition = {},
+		duration = {max = 100, min = -1},
+	},
+	Shape = {
+		speed = {},
+		speedVariance = {},
+		sourcePositionVariancex = {},
+		sourcePositionVariancey = {},
+		gravityx = {},
+		gravityy = {},
+		radialAcceleration = {},
+		radialAccelVariance = {},
+		tangentialAcceleration = {},
+		tangentialAccelVariance = {},
+	},
+	Radial = {
+		maxRadius = {},
+		maxRadiusVariance = {},
+		minRadius = {},
+		minRadiusVariance = {},
+		rotatePerSecond = {},
+		rotatePerSecondVariance = {},
+	},
+	Particles = {
+		particleLifespan = {},
+		particleLifespanVariance = {},
+		startParticleSize = {},
+		startParticleSizeVariance = {},
+		finishParticleSize = {},
+		finishParticleSizeVariance = {},
+		rotationStart = {},
+		rotationStartVariance = {},
+		rotationEnd = {},
+		rotationEndVariance = {},
+		blendFuncSource = {},
+		blendFuncDestination = {},
+	},
+	Color = {
+		startColorRed = {},
+		startColorGreen = {},
+		startColorBlue = {},
+		startColorAlpha = {},
+		startColorVarianceRed = {},
+		startColorVarianceGreen = {},
+		startColorVarianceBlue = {},
+		startColorVarianceAlpha = {},
+		finishColorRed = {},
+		finishColorGreen = {},
+		finishColorBlue = {},
+		finishColorAlpha = {},
+		finishColorVarianceRed = {},
+		finishColorVarianceGreen = {},
+		finishColorVarianceBlue = {},
+		finishColorVarianceAlpha = {}
 	}
+
 }
 
 local emitterParams = {
@@ -44,6 +97,7 @@ local emitterParams = {
 local emitter = display.newEmitter(emitterParams)
 
 local leftSheet, rightSheet, middleSheet
+local page
 
 function makeSheet(params)
 	local sheet = display.newGroup()
@@ -77,7 +131,7 @@ function makeSlider(params)
 	group.field = native.newTextField( wScreen * 0.08 + 20,  (params.y or 0) , 40, 20 )
 	group.field.inputType = "number"
 	group.field.size = 10
-	group.field.text = tostring(emitterParams[params.name])
+	group.field.text = tostring(emitterParams[params.name] or 0)
 	group.field:addEventListener("userInput", function(event)
 		if event.phase == "ended" or event.phase == "submitted" then
 			realValue = tonumber(group.field.text)
@@ -101,6 +155,23 @@ function updateEmitter(params)
 		middleSheet:insert(emitter)
 	end
 	emitter:start()
+end
+
+function showPage(name)
+	display.remove(page)
+	page = display.newGroup()
+	local vCount = 1
+	for k, v in pairs(list[name]) do
+		local slider = makeSlider{
+			name = k,
+			max = v.max or 100,
+			min = v.min or 0,
+			y = -200 + (vCount - 1) * 80
+		}			
+		page:insert(slider)
+		vCount = vCount + 1
+	end
+	leftSheet:insert(page)
 end
 
 function init()
@@ -130,20 +201,8 @@ function init()
 
 	middleSheet:insert(emitter)
 
-	local count = 0
-	for k, v in pairs(list.general) do
-		if v.component == 'slider' then
-			local slider = makeSlider{
-				name = k,
-				max = v.max or 100,
-				min = v.min or 0,
-				y = -200 + count * 80
-			}
-			leftSheet:insert(slider)
-		end
-		count = count + 1
-	end
-
+	showPage("Shape")
+	showPage("Emitter")
 	
 end
 
