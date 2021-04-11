@@ -80,10 +80,24 @@ local loopBtn = {}
 local playBtn = {}
 local refreshBtn = {}
 local loopTimer
+local loopMode = true
 
 function loopPlay(event)
-    print( "123123" )
-    loopTimer = timer.performWithDelay( 1000, loopPlay )
+	if loopMode then
+		if emitterParams.duration ~= -1 then
+			updateEmitter()
+		    setLoopTimer(true)
+		else
+			setLoopTimer(false)
+		end
+	end	
+end
+
+function setLoopTimer(command)
+	if loopTimer then timer.cancel(loopTimer) end
+	if command then
+		loopTimer = timer.performWithDelay((emitterParams.duration + 1) * 1000, loopPlay)
+	end
 end
 
 function makeSheet(params)
@@ -116,7 +130,7 @@ function makeSlider(params)
 	group:insert(group.slider)
 	group.text = display.newText(group, params.name, 0, (params.y or 0) -20, native.systemFont, 16)
 	group.field = native.newTextField( wScreen * 0.08 + 20,  (params.y or 0) , 40, 20 )
-	group.field.inputType = "number"
+	-- group.field.inputType = "number"
 	group.field.size = 10
 	group.field.text = tostring(emitterParams[params.name] or 0)
 	group.field:addEventListener("userInput", function(event)
@@ -136,8 +150,13 @@ end
 function updateEmitter(params)
 	if emitter then emitter:stop() end
 	if params then
-		print(params.name, params.value)
 		emitterParams[params.name] = params.value		
+	end
+	setLoopTimer(false)
+	if emitterParams.duration ~= -1 then
+		setLoopTimer(true)
+	else
+		infoText.text = "Duration set to -1 mean it will loop forever."
 	end
 	display.remove(emitter)
 	emitter = display.newEmitter(emitterParams)
@@ -373,10 +392,20 @@ function init()
         label = "Loop",
 		onEvent = function(event)
 			if event.phase == "ended" then
-				loopBtn:setFillColor(1, 1, 1)
-				playBtn:setFillColor(1, 1, 1)
-				timer.cancel(loopTimer)
-				infoText.text = "Turn off the Loop mode."
+				if loopMode then
+					loopBtn:setFillColor(1, 1, 1)
+					playBtn:setFillColor(1, 1, 1)
+					setLoopTimer(false)
+					loopMode = false
+					infoText.text = "Turn off the Loop mode."
+				else
+					loopBtn:setFillColor(1, 1, 0.5)
+					playBtn:setFillColor(0.5, 0.5, 0.5)
+					updateEmitter()
+					setLoopTimer(true)
+					loopMode = true
+					infoText.text = "Turn on the Loop mode."
+				end
 			end
 		end,
 		shape = "roundedRect",
@@ -418,7 +447,6 @@ function init()
 	}
 	leftSheet:insert(refreshBtn)
 
-	loopTimer = timer.performWithDelay( 1000, loopPlay )
 end
 
 init()
