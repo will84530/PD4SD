@@ -102,6 +102,7 @@ local rightSheet, rightSheet, middleSheet
 local page
 local fileManager = {}
 local saveContent = {}
+local infoText
 
 function makeSheet(params)
 	local sheet = display.newGroup()
@@ -229,11 +230,12 @@ function loadData(name, extension)
 	if extension == "png" then
 		emitterParams.textureFileName = "Texture/" .. name
 		updateEmitter()
+		infoText.text = "Read the texture file successfully."
 	elseif extension == "json" then
 		local path = system.pathForFile( "Texture/" .. name)
 		local file, errorString = io.open( path, "r" )		 
 		if not file then
-		    print( "File error: " .. errorString )
+		    infoText.text = "Read the setting file failed. Error:" .. errorString
 		else
 			local contents = file:read( "*a" )
 			local t = Json.decode( contents )
@@ -249,13 +251,9 @@ function loadData(name, extension)
 			updateEmitter()
 			showPage("Emitter")
 			io.close( file )
-		    -- for line in file:lines() do
-		    --     print( line )		        
-		    -- end
-		    -- io.close( file )
-
 		end		 
 		file = nil
+		infoText.text = "Read the setting file successfully."
 	end
 end
 
@@ -365,6 +363,8 @@ function init()
 	saveContent = makeSaveContent()
 	saveContent.y = 320
 	leftSheet:insert(saveContent)
+
+	infoText = display.newText(middleSheet, "Particles Designer for Win10 Version 0.1.0", 0, 340, native.systemFont, 16)
 end
 
 init()
