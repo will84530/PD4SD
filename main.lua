@@ -99,7 +99,7 @@ local emitter = display.newEmitter(emitterParams)
 
 local rightSheet, rightSheet, middleSheet
 local page
-local fileManager
+local fileManager = {}
 
 function makeSheet(params)
 	local sheet = display.newGroup()
@@ -179,7 +179,7 @@ end
 function makeFileManager(files, params, extension)
 	local group = display.newGroup()
 
-	fileManager = Widget.newPickerWheel{
+	local picker = Widget.newPickerWheel{
 		x = params.x,
 		y = params.y,
 		fontSize = 16,
@@ -195,7 +195,7 @@ function makeFileManager(files, params, extension)
 		width = 127,
 	    rowHeight = 20,
 	}
-	group:insert(fileManager)
+	group:insert(picker)
 
 	local button = Widget.newButton{
 		x = params.x,
@@ -203,8 +203,8 @@ function makeFileManager(files, params, extension)
         label = "Chose",
 		onEvent = function(event)
 			if event.phase == "ended" then
-				updateData(extension)
-				print('!!')
+				print(picker:getValues()[1].value)
+				loadData("123", extension)
 			end
 		end,
 		shape = "roundedRect",
@@ -213,16 +213,35 @@ function makeFileManager(files, params, extension)
         fillColor = {default = {1,1,1}, over = {0.5, 0.5, 0.5}},
 	}
 	group:insert(button)
+ 	print(extension)
+	local text = display.newText(group, extension == "png" and "Texture:" or "Script:", params.x, params.y - 70, native.systemFont, 16)
 
 	leftSheet:insert(group)
+
+	return group
 end
 
 
-function updateData(extension)
+function loadData(name, extension)
+	
+
 	if extension == "png" then
 
 	elseif extension == "json" then
-
+		local path = system.pathForFile( "Texture/sample.json", system.ResourceDirectory )
+ 
+		local file, errorString = io.open( path, "r" )
+		 
+		if not file then
+		    print( "File error: " .. errorString )
+		else
+		    for line in file:lines() do
+		        print( line )
+		    end
+		    io.close( file )
+		end
+		 
+		file = nil
 	end
 end
 
@@ -243,8 +262,8 @@ function refreshFileManager()
 			jsonList[#jsonList + 1] = file
 		end
 	end
-	makeFileManager(pngList, {x = -80, y = 200, extension = "png"})
-	makeFileManager(jsonList, {x = 80, y = 200, extension = "json"})
+	fileManager.png = makeFileManager(pngList, {x = -80, y = 200}, "png")
+	fileManager.json = makeFileManager(jsonList, {x = 80, y = 200}, "json")
 end
 
 
