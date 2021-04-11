@@ -4,7 +4,7 @@ This is made for designer who is working on particle design on windows OS.
 
 ## How to use
 
-You can move your `.json` particle files or `.png` texture files into the folder `\Resources\Assets` to load on this simulator and edit it, and you can save the file you edited, the file will save in the folder `C:\Users\[UserName]\AppData\Roaming\PD4SD\Documents` . (explorer window will pop when you saved it.)
+You can move your `.json` particle files or `.png` texture files into the folder `\Resources\Assets` to be loaded and be edited on this simulator, and you can save the file you edited, the file will save in the folder `C:\Users\[UserName]\AppData\Roaming\PD4SD\Documents` . (explorer window will pop when it be saved.)
 
 
 
