@@ -34,7 +34,7 @@ local list = {
 		rotatePerSecondVariance = {max = 1000, min = -1000},
 	},
 	Particles = {
-		particleLifespan = {max = 1000, min = -1000},
+		particleLifespan = {max = 100},
 		particleLifespanVariance = {max = 1000, min = -1000},
 		startParticleSize = {max = 1000},
 		startParticleSizeVariance = {max = 1000, min = -1000},
