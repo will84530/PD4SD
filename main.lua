@@ -68,34 +68,7 @@ local list = {
 
 }
 
-local emitterParams = {
-	-- startColorAlpha = 1,
- --    startParticleSizeVariance = 53.47,
- --    startColorGreen = 0.3031555,
- --    yCoordFlipped = -1,
- --    blendFuncSource = 770,
- --    rotatePerSecondVariance = 153.95,
- --    particleLifespan = 0.7237,
- --    tangentialAcceleration = -144.74,
- --    finishColorBlue = 0.3699196,
- --    finishColorGreen = 0.5443883,
- --    blendFuncDestination = 1,
- --    startParticleSize = 50.95,
- --    startColorRed = 0.8373094,
- --    textureFileName = "Assets/sample.png",
- --    startColorVarianceAlpha = 1,
- --    maxParticles = 256,
- --    finishParticleSize = 64,
- --    duration = -1,
- --    finishColorRed = 1,
- --    maxRadiusVariance = 72.63,
- --    finishParticleSizeVariance = 64,
- --    gravityy = -671.05,
- --    speedVariance = 90.79,
- --    tangentialAccelVariance = -92.11,
- --    angleVariance = -142.62,
- --    angle = -244.11
-}
+local emitterParams = {}
 local emitter
 
 local rightSheet, rightSheet, middleSheet
@@ -103,6 +76,15 @@ local page
 local fileManager = {}
 local saveContent = {}
 local infoText = {}
+local loopBtn = {}
+local playBtn = {}
+local refreshBtn = {}
+local loopTimer
+
+function loopPlay(event)
+    print( "123123" )
+    loopTimer = timer.performWithDelay( 1000, loopPlay )
+end
 
 function makeSheet(params)
 	local sheet = display.newGroup()
@@ -272,7 +254,7 @@ function saveData()
 	        file:write(Json.prettify(emitterParams))
 	        io.close(file)
 			file = nil
-	    	os.execute( "explorer " .. system.pathForFile("",system.DocumentsDirectory) )
+	    	os.execute("explorer " .. system.pathForFile("", system.DocumentsDirectory))
 	        infoText.text = "Save file successfully."
 	    end
 	end
@@ -281,6 +263,7 @@ end
 
 
 function refreshFileManager()
+	fileManager = {}
 	local path = system.pathForFile("Assets", system.ResourceDirectory)
  	local pngList = {}
  	local jsonList = {}
@@ -297,8 +280,8 @@ function refreshFileManager()
 			jsonList[#jsonList + 1] = file
 		end
 	end
-	fileManager.png = makeFileManager(pngList, {x = 80, y = -200}, "png")
-	fileManager.json = makeFileManager(jsonList, {x = -80, y = -200}, "json")
+	fileManager.png = makeFileManager(pngList, {x = 80, y = -150}, "png")
+	fileManager.json = makeFileManager(jsonList, {x = -80, y = -150}, "json")
 end
 
 function makeSaveContent()
@@ -383,6 +366,59 @@ function init()
 	leftSheet:insert(saveContent)
 
 	infoText = display.newText(middleSheet, "Particles Designer for Win10 Version 0.1.0", 0, 340, native.systemFont, 16)
+
+	loopBtn = Widget.newButton{
+		x = -60,
+		y = -320,
+        label = "Loop",
+		onEvent = function(event)
+			if event.phase == "ended" then
+				loopBtn:setFillColor(1, 1, 1)
+				playBtn:setFillColor(1, 1, 1)
+				timer.cancel(loopTimer)
+				infoText.text = "Turn off the Loop mode."
+			end
+		end,
+		shape = "roundedRect",
+		width = 100,
+        height = 30,        
+        fillColor = {default = {1, 1, 0.5}, over = {0.5, 0.5, 0.5}},
+	}
+	leftSheet:insert(loopBtn)
+
+	playBtn = Widget.newButton{
+		x = 60,
+		y = -320,
+        label = "Play",
+		onEvent = function(event)
+			if event.phase == "ended" then
+				
+			end
+		end,
+		shape = "roundedRect",
+		width = 100,
+        height = 30,        
+        fillColor = {default = {0.5, 0.5, 0.5}, over = {0.5, 0.5, 0.5}},
+	}
+	leftSheet:insert(playBtn)
+
+	refreshBtn = Widget.newButton{
+		x = 0,
+		y = -20,
+        label = "Refresh files",
+		onEvent = function(event)
+			if event.phase == "ended" then
+				refreshFileManager()
+			end
+		end,
+		shape = "roundedRect",
+		width = 150,
+        height = 30,        
+        fillColor = {default = {1,1,1}, over = {0.5, 0.5, 0.5}},
+	}
+	leftSheet:insert(refreshBtn)
+
+	loopTimer = timer.performWithDelay( 1000, loopPlay )
 end
 
 init()
