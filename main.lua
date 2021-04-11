@@ -69,40 +69,40 @@ local list = {
 }
 
 local emitterParams = {
-	startColorAlpha = 1,
-    startParticleSizeVariance = 53.47,
-    startColorGreen = 0.3031555,
-    yCoordFlipped = -1,
-    blendFuncSource = 770,
-    rotatePerSecondVariance = 153.95,
-    particleLifespan = 0.7237,
-    tangentialAcceleration = -144.74,
-    finishColorBlue = 0.3699196,
-    finishColorGreen = 0.5443883,
-    blendFuncDestination = 1,
-    startParticleSize = 50.95,
-    startColorRed = 0.8373094,
-    textureFileName = "Texture/sample.png",
-    startColorVarianceAlpha = 1,
-    maxParticles = 256,
-    finishParticleSize = 64,
-    duration = -1,
-    finishColorRed = 1,
-    maxRadiusVariance = 72.63,
-    finishParticleSizeVariance = 64,
-    gravityy = -671.05,
-    speedVariance = 90.79,
-    tangentialAccelVariance = -92.11,
-    angleVariance = -142.62,
-    angle = -244.11
+	-- startColorAlpha = 1,
+ --    startParticleSizeVariance = 53.47,
+ --    startColorGreen = 0.3031555,
+ --    yCoordFlipped = -1,
+ --    blendFuncSource = 770,
+ --    rotatePerSecondVariance = 153.95,
+ --    particleLifespan = 0.7237,
+ --    tangentialAcceleration = -144.74,
+ --    finishColorBlue = 0.3699196,
+ --    finishColorGreen = 0.5443883,
+ --    blendFuncDestination = 1,
+ --    startParticleSize = 50.95,
+ --    startColorRed = 0.8373094,
+ --    textureFileName = "Assets/sample.png",
+ --    startColorVarianceAlpha = 1,
+ --    maxParticles = 256,
+ --    finishParticleSize = 64,
+ --    duration = -1,
+ --    finishColorRed = 1,
+ --    maxRadiusVariance = 72.63,
+ --    finishParticleSizeVariance = 64,
+ --    gravityy = -671.05,
+ --    speedVariance = 90.79,
+ --    tangentialAccelVariance = -92.11,
+ --    angleVariance = -142.62,
+ --    angle = -244.11
 }
-local emitter = display.newEmitter(emitterParams)
+local emitter
 
 local rightSheet, rightSheet, middleSheet
 local page
 local fileManager = {}
 local saveContent = {}
-local infoText
+local infoText = {}
 
 function makeSheet(params)
 	local sheet = display.newGroup()
@@ -152,7 +152,7 @@ function makeSlider(params)
 end
 
 function updateEmitter(params)
-	emitter:stop()
+	if emitter then emitter:stop() end
 	if params then
 		print(params.name, params.value)
 		emitterParams[params.name] = params.value		
@@ -228,14 +228,14 @@ end
 function loadData(name, extension)
 	print(name, extension)
 	if extension == "png" then
-		emitterParams.textureFileName = "Texture/" .. name
+		emitterParams.textureFileName = "Assets/" .. name
 		updateEmitter()
 		infoText.text = "Read the texture file successfully."
 	elseif extension == "json" then
-		local path = system.pathForFile( "Texture/" .. name)
+		local path = system.pathForFile( "Assets/" .. name)
 		local file, errorString = io.open( path, "r" )		 
 		if not file then
-		    infoText.text = "Read the setting file failed. Error:" .. errorString
+		    infoText.text = "Read the setting file failed. Error: " .. errorString
 		else
 			local contents = file:read( "*a" )
 			local t = Json.decode( contents )
@@ -243,7 +243,7 @@ function loadData(name, extension)
 			emitterParams = {}
 			for k, v in pairs(t) do
 				if k == "textureFileName" then
-					emitterParams[k] = "Texture/" .. v
+					emitterParams[k] = "Assets/" .. v
 				else 
 					emitterParams[k] = v
 				end
@@ -257,13 +257,30 @@ function loadData(name, extension)
 	end
 end
 
-function saveData(name)
-	print("save!")
+function saveData()
+	if not saveContent.field.text then
+		infoText.text = "Save file failed. The file name is empty."
+	else
+	    local path = system.pathForFile( saveContent.field.text .. ".json", system.DocumentsDirectory)
+	    local file, errorString = io.open( path, "w" )	 
+	    if not file then
+	        infoText.text = "Save file failed. Error: " .. errorString
+	    else
+	    	local name = emitterParams.textureFileName
+	    	local dirPos = name:find("/")
+	    	emitterParams.textureFileName = name:sub(dirPos + 1)
+	        file:write(Json.prettify(emitterParams))
+	        io.close(file)
+			file = nil
+	        infoText.text = "Save file successfully."
+	    end
+	end
+	
 end
 
 
 function refreshFileManager()
-	local path = system.pathForFile("Texture", system.ResourceDirectory)
+	local path = system.pathForFile("Assets", system.ResourceDirectory)
  	local pngList = {}
  	local jsonList = {}
 
@@ -287,7 +304,7 @@ function makeSaveContent()
 	local group = display.newGroup()
 
 	group.field = native.newTextField( -10, 0 , 120, 30 )
-	group.field.size = 16
+	group.field.size = 14
 	group.field.text = "new_particle"
 	group:insert(group.field)
 
@@ -342,7 +359,7 @@ function init()
 		y = yCenter,
 		color = {0.2, 0.2, 0.2}
 	}
-
+	loadData("sample.json", "json")
 	middleSheet:insert(emitter)
 
 	local pageManager = Widget.newSegmentedControl{
