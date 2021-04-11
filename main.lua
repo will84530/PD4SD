@@ -272,6 +272,7 @@ function saveData()
 	        file:write(Json.prettify(emitterParams))
 	        io.close(file)
 			file = nil
+	    	os.execute( "explorer " .. system.pathForFile("",system.DocumentsDirectory) )
 	        infoText.text = "Save file successfully."
 	    end
 	end
