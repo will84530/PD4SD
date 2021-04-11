@@ -101,6 +101,7 @@ local emitter = display.newEmitter(emitterParams)
 local rightSheet, rightSheet, middleSheet
 local page
 local fileManager = {}
+local saveContent = {}
 
 function makeSheet(params)
 	local sheet = display.newGroup()
@@ -257,6 +258,11 @@ function loadData(name, extension)
 	end
 end
 
+function saveData(name)
+	print("save!")
+end
+
+
 function refreshFileManager()
 	local path = system.pathForFile("Texture", system.ResourceDirectory)
  	local pngList = {}
@@ -274,11 +280,38 @@ function refreshFileManager()
 			jsonList[#jsonList + 1] = file
 		end
 	end
-	fileManager.png = makeFileManager(pngList, {x = 80, y = 200}, "png")
-	fileManager.json = makeFileManager(jsonList, {x = -80, y = 200}, "json")
+	fileManager.png = makeFileManager(pngList, {x = 80, y = -200}, "png")
+	fileManager.json = makeFileManager(jsonList, {x = -80, y = -200}, "json")
 end
 
+function makeSaveContent()
+	local group = display.newGroup()
 
+	group.field = native.newTextField( -10, 0 , 120, 30 )
+	group.field.size = 16
+	group.field.text = "new_particle"
+	group:insert(group.field)
+
+	group.text =  display.newText(group, "File name:", -110, 0, native.systemFont, 16)
+
+	group.button = Widget.newButton{
+		x = 110,
+		y = 0,
+        label = "Save",
+		onEvent = function(event)
+			if event.phase == "ended" then
+				saveData()
+			end
+		end,
+		shape = "roundedRect",
+		width = 80,
+        height = 30,        
+        fillColor = {default = {1,1,1}, over = {0.5, 0.5, 0.5}},
+	}
+	group:insert(group.button)
+
+	return group
+end
 
 
 
@@ -327,6 +360,10 @@ function init()
 	showPage("Emitter")
 	
 	refreshFileManager()
+
+	saveContent = makeSaveContent()
+	saveContent.y = 320
+	leftSheet:insert(saveContent)
 end
 
 init()
