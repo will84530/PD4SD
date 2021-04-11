@@ -394,13 +394,11 @@ function init()
 			if event.phase == "ended" then
 				if loopMode then
 					loopBtn:setFillColor(1, 1, 1)
-					playBtn:setFillColor(1, 1, 1)
 					setLoopTimer(false)
 					loopMode = false
 					infoText.text = "Turn off the Loop mode."
 				else
 					loopBtn:setFillColor(1, 1, 0.5)
-					playBtn:setFillColor(0.5, 0.5, 0.5)
 					updateEmitter()
 					setLoopTimer(true)
 					loopMode = true
@@ -421,13 +419,13 @@ function init()
         label = "Play",
 		onEvent = function(event)
 			if event.phase == "ended" then
-				
+				updateEmitter()
 			end
 		end,
 		shape = "roundedRect",
 		width = 100,
         height = 30,        
-        fillColor = {default = {0.5, 0.5, 0.5}, over = {0.5, 0.5, 0.5}},
+        fillColor = {default = {1, 1, 1}, over = {0.5, 0.5, 0.5}},
 	}
 	leftSheet:insert(playBtn)
 
