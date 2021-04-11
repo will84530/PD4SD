@@ -227,7 +227,8 @@ end
 function loadData(name, extension)
 	print(name, extension)
 	if extension == "png" then
-
+		emitterParams.textureFileName = "Texture/" .. name
+		updateEmitter()
 	elseif extension == "json" then
 		local path = system.pathForFile( "Texture/" .. name)
 		local file, errorString = io.open( path, "r" )		 
