@@ -2,12 +2,16 @@
 
 This is made for designer who is working on particle design on windows OS.
 
-
-
 ## How to use
 
 You can move your `.json` particle files or `.png` texture files into the folder `\Resources\Assets` to load on this simulator and edit it, and you can save the file you edited, the file will save in the folder `C:\Users\[UserName]\AppData\Roaming\PD4SD\Documents` . (explorer window will pop when you saved it.)
 
+
+
+## Prepare
+
+if you want to paste the `.json` files into `Assets` folder, you must bring the `.png` file together or particle setting will not find the texture.
+if you want to open its scoure code on Solar2D simulator, please use the screen size `1280 * 720` .
 
 ## Future
 
