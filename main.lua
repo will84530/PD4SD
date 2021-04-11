@@ -274,6 +274,7 @@ function saveData()
 	        io.close(file)
 			file = nil
 	    	os.execute("explorer " .. system.pathForFile("", system.DocumentsDirectory))
+	    	emitterParams.textureFileName = name
 	        infoText.text = "Save file successfully."
 	    end
 	end
@@ -445,6 +446,7 @@ function init()
 	}
 	leftSheet:insert(refreshBtn)
 
+	middleSheet:toBack()
 end
 
 init()
