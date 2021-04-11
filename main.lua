@@ -1,4 +1,5 @@
-local Widget = require( "widget" )
+local Widget = require("widget")
+local Lfs = require("lfs")
 
 local xCenter, yCenter = display.contentCenterX, display.contentCenterY
 local wScreen, hScreen = display.actualContentWidth, display.actualContentHeight
@@ -98,6 +99,7 @@ local emitter = display.newEmitter(emitterParams)
 
 local rightSheet, rightSheet, middleSheet
 local page
+local fileManager
 
 function makeSheet(params)
 	local sheet = display.newGroup()
@@ -174,6 +176,85 @@ function showPage(name)
 	rightSheet:insert(page)
 end
 
+function makeFileManager(files, params, extension)
+	local group = display.newGroup()
+
+	fileManager = Widget.newPickerWheel{
+		x = params.x,
+		y = params.y,
+		fontSize = 16,
+		columns = {
+			{
+		        align = "left",
+		        width = 126,
+		        startIndex = 1,
+		        labels = files
+		    },
+		},
+		style = "resizable",
+		width = 127,
+	    rowHeight = 20,
+	}
+	group:insert(fileManager)
+
+	local button = Widget.newButton{
+		x = params.x,
+		y = params.y + 70,
+        label = "Chose",
+		onEvent = function(event)
+			if event.phase == "ended" then
+				updateData(extension)
+				print('!!')
+			end
+		end,
+		shape = "roundedRect",
+		width = 100,
+        height = 30,        
+        fillColor = {default = {1,1,1}, over = {0.5, 0.5, 0.5}},
+	}
+	group:insert(button)
+
+	leftSheet:insert(group)
+end
+
+
+function updateData(extension)
+	if extension == "png" then
+
+	elseif extension == "json" then
+
+	end
+end
+
+function refreshFileManager()
+	local path = system.pathForFile("Texture", system.ResourceDirectory)
+ 	local pngList = {}
+ 	local jsonList = {}
+
+ 	local function getExtension(str)
+ 		local dotPos = str:find( "%.")
+ 		return str:sub(dotPos + 1)
+ 	end
+
+	for file in Lfs.dir(path) do
+		if getExtension(file) == "png" then
+			pngList[#pngList + 1] = file
+		elseif getExtension(file) == "json" then
+			jsonList[#jsonList + 1] = file
+		end
+	end
+	makeFileManager(pngList, {x = -80, y = 200, extension = "png"})
+	makeFileManager(jsonList, {x = 80, y = 200, extension = "json"})
+end
+
+
+
+
+
+
+
+
+ 
 function init()
 	rightSheet = makeSheet{
 		width = wScreen * 0.25,
@@ -214,6 +295,7 @@ function init()
 	rightSheet:insert(pageManager)
 	showPage("Emitter")
 	
+	refreshFileManager()
 end
 
 init()
