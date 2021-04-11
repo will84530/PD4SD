@@ -1,5 +1,6 @@
 local Widget = require("widget")
 local Lfs = require("lfs")
+local Json = require( "json" )
 
 local xCenter, yCenter = display.contentCenterX, display.contentCenterY
 local wScreen, hScreen = display.actualContentWidth, display.actualContentHeight
@@ -203,8 +204,7 @@ function makeFileManager(files, params, extension)
         label = "Chose",
 		onEvent = function(event)
 			if event.phase == "ended" then
-				print(picker:getValues()[1].value)
-				loadData("123", extension)
+				loadData(picker:getValues()[1].value, extension)
 			end
 		end,
 		shape = "roundedRect",
@@ -223,24 +223,27 @@ end
 
 
 function loadData(name, extension)
-	
-
+	print(name, extension)
 	if extension == "png" then
 
 	elseif extension == "json" then
-		local path = system.pathForFile( "Texture/sample.json", system.ResourceDirectory )
- 
-		local file, errorString = io.open( path, "r" )
-		 
+		local path = system.pathForFile( "Texture/" .. name, system.ResourceDirectory )
+		local file, errorString = io.open( path, "r" )		 
 		if not file then
 		    print( "File error: " .. errorString )
 		else
-		    for line in file:lines() do
-		        print( line )
-		    end
-		    io.close( file )
-		end
-		 
+			local contents = file:read( "*a" )
+			local t = Json.decode( contents )
+			for k, v in pairs(t) do
+				print(k, v)
+			end
+			io.close( file )
+		    -- for line in file:lines() do
+		    --     print( line )		        
+		    -- end
+		    -- io.close( file )
+
+		end		 
 		file = nil
 	end
 end
