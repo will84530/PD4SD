@@ -151,12 +151,13 @@ end
 
 function updateEmitter(params)
 	emitter:stop()
-	if emitterParams[params.name] then
-		emitterParams[params.name] = params.value
-		display.remove(emitter)
-		emitter = display.newEmitter(emitterParams)
-		middleSheet:insert(emitter)
+	if params then
+		print(params.name, params.value)
+		emitterParams[params.name] = params.value		
 	end
+	display.remove(emitter)
+	emitter = display.newEmitter(emitterParams)
+	middleSheet:insert(emitter)
 	emitter:start()
 end
 
@@ -227,16 +228,24 @@ function loadData(name, extension)
 	if extension == "png" then
 
 	elseif extension == "json" then
-		local path = system.pathForFile( "Texture/" .. name, system.ResourceDirectory )
+		local path = system.pathForFile( "Texture/" .. name)
 		local file, errorString = io.open( path, "r" )		 
 		if not file then
 		    print( "File error: " .. errorString )
 		else
 			local contents = file:read( "*a" )
 			local t = Json.decode( contents )
+
+			emitterParams = {}
 			for k, v in pairs(t) do
-				print(k, v)
+				if k == "textureFileName" then
+					emitterParams[k] = "Texture/" .. v
+				else 
+					emitterParams[k] = v
+				end
 			end
+			updateEmitter()
+			showPage("Emitter")
 			io.close( file )
 		    -- for line in file:lines() do
 		    --     print( line )		        
@@ -265,8 +274,8 @@ function refreshFileManager()
 			jsonList[#jsonList + 1] = file
 		end
 	end
-	fileManager.png = makeFileManager(pngList, {x = -80, y = 200}, "png")
-	fileManager.json = makeFileManager(jsonList, {x = 80, y = 200}, "json")
+	fileManager.png = makeFileManager(pngList, {x = 80, y = 200}, "png")
+	fileManager.json = makeFileManager(jsonList, {x = -80, y = 200}, "json")
 end
 
 
