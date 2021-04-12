@@ -1,4 +1,4 @@
-# Particle Designer for StudyCat Design-Team v.0.1.0
+# Particle Designer for Studycat Design-Team v.0.1.0
 
 This is made for designer who is working on particle design on windows OS.
 
